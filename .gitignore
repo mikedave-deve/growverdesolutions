@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Build output
+dist/
+server/dist/
+
+# Environment files — never commit real credentials
+.env
+.env.local
+.env.*.local
+server/.env
+
+# Logs
+npm-debug.log*
+*.log
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Locally-extracted TLS cert (machine-specific, not needed elsewhere)
+server/certs/*.pem
