@@ -29,13 +29,15 @@ export const getDepositAccounts = asyncHandler(async (req, res) => {
 });
 
 // POST /api/payroll/deposit-accounts
-// Only the last 4 digits of the account number are ever stored — the
-// full number is used here only to derive that, then discarded.
+// Only the last 4 digits of the account/routing numbers are ever
+// stored — the full numbers are used here only to derive those, then
+// discarded.
 export const addDepositAccount = asyncHandler(async (req, res) => {
-  const { label, accountHolder, bankName, accountNumber, accountType, split } = req.body;
+  const { label, accountHolder, bankName, accountNumber, routingNumber, accountType, split } = req.body;
 
   if (!label || !accountHolder || !bankName) throw new AppError("Account label, holder name, and bank name are required.", 400);
   if (!accountNumber || !/^\d{4,17}$/.test(accountNumber)) throw new AppError("Account number should be 4–17 digits.", 400);
+  if (!routingNumber || !/^\d{9}$/.test(routingNumber)) throw new AppError("Routing number should be 9 digits.", 400);
   const splitNum = Number(split);
   if (Number.isNaN(splitNum) || splitNum < 0 || splitNum > 100) throw new AppError("Split must be between 0 and 100.", 400);
 
@@ -45,6 +47,7 @@ export const addDepositAccount = asyncHandler(async (req, res) => {
     accountHolder,
     bankName,
     last4: accountNumber.slice(-4),
+    routingLast4: routingNumber.slice(-4),
     accountType: accountType === "Savings" ? "Savings" : "Checking",
     split: splitNum,
   });

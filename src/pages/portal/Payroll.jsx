@@ -23,33 +23,44 @@ function StatCard({ label, value, sub }) {
 }
 
 function AddAccountForm({ onAdd, onCancel }) {
-  const [form, setForm] = useState({ label: "", accountHolder: "", bankName: "", accountNumber: "", accountType: "Checking", split: "" });
+  const [form, setForm] = useState({ label: "", accountHolder: "", bankName: "", accountNumber: "", routingNumber: "", accountType: "Checking", split: "" });
   const [saving, setSaving] = useState(false);
   const [showAccountNumber, setShowAccountNumber] = useState(false);
+  const [showRoutingNumber, setShowRoutingNumber] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await onAdd({ ...form, last4: form.accountNumber.slice(-4), split: Number(form.split) || 0 });
+      await onAdd({ ...form, split: Number(form.split) || 0 });
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <form onSubmit={submit} className="grid sm:grid-cols-2 gap-4 border-t border-sand-100 pt-4 mt-4">
-      <Field label="Account label" htmlFor="dLabel"><Input id="dLabel" placeholder="e.g. Secondary Savings" value={form.label} onChange={set("label")} required /></Field>
-      <Field label="Account holder name" htmlFor="dHolder"><Input id="dHolder" value={form.accountHolder} onChange={set("accountHolder")} required /></Field>
-      <Field label="Bank name" htmlFor="dBank"><Input id="dBank" value={form.bankName} onChange={set("bankName")} required /></Field>
+    <form onSubmit={submit} autoComplete="off" className="grid sm:grid-cols-2 gap-4 border-t border-sand-100 pt-4 mt-4">
+      <Field label="Account label" htmlFor="dLabel"><Input id="dLabel" placeholder="e.g. Secondary Savings" autoComplete="off" value={form.label} onChange={set("label")} required /></Field>
+      <Field label="Account holder name" htmlFor="dHolder"><Input id="dHolder" autoComplete="off" value={form.accountHolder} onChange={set("accountHolder")} required /></Field>
+      <Field label="Bank name" htmlFor="dBank"><Input id="dBank" autoComplete="off" value={form.bankName} onChange={set("bankName")} required /></Field>
       <Field label="Account number" htmlFor="dAcct">
         <div className="relative">
-          <Input id="dAcct" type={showAccountNumber ? "text" : "password"} inputMode="numeric" value={form.accountNumber} onChange={set("accountNumber")} className="pr-10" required />
+          <Input id="dAcct" type={showAccountNumber ? "text" : "password"} autoComplete="new-password" inputMode="numeric" value={form.accountNumber} onChange={set("accountNumber")} className="pr-10" required />
           <button type="button" onClick={() => setShowAccountNumber((s) => !s)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
             aria-label={showAccountNumber ? "Hide account number" : "Show account number"}>
             {showAccountNumber ? <EyeOff size={17} /> : <Eye size={17} />}
+          </button>
+        </div>
+      </Field>
+      <Field label="Routing number" htmlFor="dRouting">
+        <div className="relative">
+          <Input id="dRouting" type={showRoutingNumber ? "text" : "password"} autoComplete="new-password" inputMode="numeric" value={form.routingNumber} onChange={set("routingNumber")} className="pr-10" required />
+          <button type="button" onClick={() => setShowRoutingNumber((s) => !s)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
+            aria-label={showRoutingNumber ? "Hide routing number" : "Show routing number"}>
+            {showRoutingNumber ? <EyeOff size={17} /> : <Eye size={17} />}
           </button>
         </div>
       </Field>
@@ -60,7 +71,7 @@ function AddAccountForm({ onAdd, onCancel }) {
         </select>
       </Field>
       <Field label="Split %" htmlFor="dSplit" hint="Percent of each paycheck sent here.">
-        <Input id="dSplit" type="number" min="0" max="100" value={form.split} onChange={set("split")} required />
+        <Input id="dSplit" type="number" min="0" max="100" autoComplete="off" value={form.split} onChange={set("split")} required />
       </Field>
       <div className="sm:col-span-2 flex gap-2">
         <Button type="submit" size="sm" disabled={saving}>{saving ? "Saving…" : "Save Account"}</Button>

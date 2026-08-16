@@ -14,6 +14,7 @@ const depositAccountSchema = new Schema(
     accountHolder: { type: String, required: true, trim: true },
     bankName: { type: String, required: true, trim: true },
     last4: { type: String, required: true },
+    routingLast4: { type: String, required: true },
     accountType: { type: String, enum: ["Checking", "Savings"], default: "Checking" },
     split: { type: Number, default: 0, min: 0, max: 100 },
   },
@@ -27,6 +28,7 @@ depositAccountSchema.methods.toSafeJSON = function toSafeJSON() {
     accountHolder: this.accountHolder,
     bankName: this.bankName,
     last4: this.last4,
+    routingLast4: this.routingLast4,
     accountType: this.accountType,
     split: this.split,
   };
