@@ -279,7 +279,7 @@ export function Payroll() {
               Enter the 6-digit code sent to your email to confirm this transfer of{" "}
               <strong>{formatCurrency(pendingTransfer.amount)}</strong> from your {pendingTransfer.from} to {pendingTransfer.to}.
             </p>
-            <Field label="Confirmation code" htmlFor="code" error={codeError} hint={!codeError ? "Demo code: 123456" : undefined}>
+            <Field label="Confirmation code" htmlFor="code" error={codeError} hint={!codeError ? "" : undefined}>
               <Input id="code" inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} className="font-mono tracking-widest text-center text-lg" />
             </Field>
             <p className="text-xs text-ink-700/50 mt-3">Didn't get a code? <Link to={ROUTES.SUPPORT} className="text-forest-700 font-medium hover:underline">Contact Support</Link>.</p>

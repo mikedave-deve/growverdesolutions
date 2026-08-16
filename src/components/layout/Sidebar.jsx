@@ -1,11 +1,13 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutGrid, User, FileText, ClipboardList, History, Clock, SlidersHorizontal,
-  ShieldCheck, Wallet, Truck, Bell, Settings, LifeBuoy, KeyRound, PiggyBank, X,
+  ShieldCheck, Wallet, Truck, Bell, Settings, LifeBuoy, KeyRound, PiggyBank, LogOut, X,
 } from "lucide-react";
 import { ROUTES } from "../../constants/routes.js";
 import { Logo } from "../brand/Logo.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useToast } from "../../context/ToastContext.jsx";
 
 const NAV = [
   { to: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutGrid, end: true },
@@ -47,6 +49,17 @@ function NavItem({ to, label, icon: Icon, end, onClick }) {
 }
 
 export function Sidebar({ mobileOpen, onCloseMobile }) {
+  const { logout } = useAuth();
+  const { push } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    onCloseMobile?.();
+    await logout();
+    push("You've been signed out.");
+    navigate(ROUTES.LOGIN);
+  };
+
   const content = (
     <div className="flex flex-col h-full bg-ink-900 text-white w-64 shrink-0">
       <div className="px-5 py-6 flex items-center justify-between">
@@ -60,6 +73,14 @@ export function Sidebar({ mobileOpen, onCloseMobile }) {
       </nav>
       <div className="px-3 py-4 border-t border-white/10 space-y-1">
         {FOOTER_NAV.map((item) => <NavItem key={item.to} {...item} onClick={onCloseMobile} />)}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-ink-100/80 hover:bg-ink-800 hover:text-white"
+        >
+          <LogOut size={17} strokeWidth={2} className="shrink-0" />
+          <span className="truncate">Log Out</span>
+        </button>
       </div>
     </div>
   );
