@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Menu, X, Phone, MapPin, Mail, ShieldAlert, Linkedin, Twitter, Facebook } from "lucide-react";
 import { ROUTES } from "../constants/routes.js";
 import { Logo } from "../components/brand/Logo.jsx";
+import { ORGANIZATION_JSON_LD } from "../constants/seo.js";
 
 const LINKS = [
   { to: ROUTES.HOME, label: "Home" },
@@ -17,12 +19,15 @@ const CONSENT_KEY = "gv_cookie_consent";
 function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
+  // Session-scoped on purpose: reappears every time the site is freshly
+  // opened (new tab/browser launch), but doesn't re-pop on every internal
+  // page click during that same visit.
   useEffect(() => {
-    if (!localStorage.getItem(CONSENT_KEY)) setVisible(true);
+    if (!sessionStorage.getItem(CONSENT_KEY)) setVisible(true);
   }, []);
 
   function decide(value) {
-    localStorage.setItem(CONSENT_KEY, value);
+    sessionStorage.setItem(CONSENT_KEY, value);
     setVisible(false);
   }
 
@@ -55,16 +60,20 @@ export function PublicLayout() {
 
   return (
     <div className="gv-public">
+      <Helmet>
+        <html lang="en" />
+        <script type="application/ld+json">{JSON.stringify(ORGANIZATION_JSON_LD)}</script>
+      </Helmet>
       <div className="topbar">
         <div className="wrap">
           <div className="topbar-contact">
             <span><MapPin /> 480 Congress Ave, Suite 300, Austin, TX 78701</span>
-            <a href="tel:+15125550148"><Phone /> +1 (512) 555-0148</a>
+            <a href="tel:+18632433789"><Phone /> +1 (863) 243-3789</a>
             <a href="tel:+15125550192"><Phone /> +1 (512) 555-0192</a>
           </div>
           <div className="topbar-contact">
             <span>Mon – Fri: 8:30am – 6:00pm</span>
-            <a href="mailto:hello@growverdesolutions.com"><Mail /> hello@growverdesolutions.com</a>
+            <a href="mailto:info@growverdesolutions.com"><Mail /> info@growverdesolutions.com</a>
           </div>
         </div>
       </div>
@@ -142,9 +151,9 @@ export function PublicLayout() {
               <h5>Contact</h5>
               <div className="footer-contact">
                 <div><MapPin /><span>480 Congress Ave, Suite 300<br />Austin, TX 78701</span></div>
-                <div><Phone /><a href="tel:+15125550148">+1 (512) 555-0148</a></div>
+                <div><Phone /><a href="tel:+18632433789">+1 (863) 243-3789</a></div>
                 <div><Phone /><a href="tel:+15125550192">+1 (512) 555-0192</a></div>
-                <div><Mail /><a href="mailto:hello@growverdesolutions.com">hello@growverdesolutions.com</a></div>
+                <div><Mail /><a href="mailto:info@growverdesolutions.com">info@growverdesolutions.com</a></div>
               </div>
             </div>
             <div>

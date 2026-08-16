@@ -1,16 +1,18 @@
 import React, { useMemo, useState } from "react";
 import { X } from "lucide-react";
+import { SEO } from "../../components/seo/SEO.jsx";
+import { SITE_URL } from "../../constants/seo.js";
 import { ROUTES } from "../../constants/routes.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { JOBS } from "../../data/publicSiteData.js";
 
 export function Jobs() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
   const [location, setLocation] = useState("");
-  const [openJobId, setOpenJobId] = useState(null);
 
   const categories = useMemo(() => [...new Set(JOBS.map((j) => j.cat))], []);
   const locations = useMemo(() => [...new Set(JOBS.map((j) => j.loc))], []);
@@ -23,10 +25,58 @@ export function Jobs() {
     return true;
   });
 
+  // The open job lives in the URL (?job=id) rather than only in React
+  // state — that's what makes each individual job a distinct,
+  // crawlable, shareable link instead of being invisible inside a
+  // client-side-only modal.
+  const openJobId = Number(searchParams.get("job")) || null;
   const openJob = JOBS.find((j) => j.id === openJobId);
+  const setOpenJobId = (id) => {
+    const next = new URLSearchParams(searchParams);
+    if (id) next.set("job", id);
+    else next.delete("job");
+    setSearchParams(next);
+  };
+
+  const jobsItemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: JOBS.map((j, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: j.title,
+      url: `${SITE_URL}${ROUTES.JOBS}?job=${j.id}`,
+    })),
+  };
+
+  // Only fields we actually have accurate data for — no datePosted or
+  // validThrough, since JOBS is static demo data with no real posting
+  // dates, and fabricating them would violate Google's structured
+  // data guidelines (and just be wrong).
+  const openJobPostingJsonLd = openJob && {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: openJob.title,
+    description: openJob.summary,
+    identifier: { "@type": "PropertyValue", name: "Growverde Solutions", value: String(openJob.id) },
+    hiringOrganization: { "@type": "Organization", name: openJob.employer || "Growverde Solutions", sameAs: SITE_URL },
+    employmentType: openJob.type === "Full-time" ? "FULL_TIME" : openJob.type === "Part-time" ? "PART_TIME" : "CONTRACTOR",
+    jobLocationType: "TELECOMMUTE",
+    applicantLocationRequirements: { "@type": "Country", name: "USA" },
+  };
 
   return (
     <div>
+      <SEO
+        title={openJob ? `${openJob.title} — ${openJob.cat}` : "Browse Open Jobs"}
+        description={
+          openJob
+            ? `${openJob.title} (${openJob.type}, ${openJob.loc}) — ${openJob.summary}`
+            : "Search current job openings from Growverde Solutions' client network — filter by category, location, or job type across healthcare, tech, finance, legal, marketing, and HR."
+        }
+        path={openJob ? `${ROUTES.JOBS}?job=${openJob.id}` : ROUTES.JOBS}
+        jsonLd={openJob ? [jobsItemListJsonLd, openJobPostingJsonLd] : jobsItemListJsonLd}
+      />
       <section className="page-hero">
         <div className="page-hero-ring" />
         <div className="wrap">
@@ -83,7 +133,7 @@ export function Jobs() {
                 </div>
                 <div className="job-side">
                   <div className="job-salary">{j.salary}<span>Estimated range</span></div>
-                  <button className="btn btn-primary btn-sm" onClick={() => setOpenJobId(j.id)}>View Role</button>
+                  <Link to={`${ROUTES.JOBS}?job=${j.id}`} className="btn btn-primary btn-sm">View Role</Link>
                 </div>
               </div>
             ))}

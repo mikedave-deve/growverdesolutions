@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { CheckCircle2, FileText, UploadCloud, X } from "lucide-react";
+import { SEO } from "../../components/seo/SEO.jsx";
 import { ROUTES } from "../../constants/routes.js";
 import { Link } from "react-router-dom";
 import { careersService } from "../../services/careersService.js";
@@ -47,6 +48,11 @@ export function Resume() {
 
   return (
     <div>
+      <SEO
+        title="Submit Your Resume"
+        description="Submit your resume to Growverde Solutions and our recruiters will match you to relevant roles across healthcare, technology, finance, legal, marketing, and HR as they open."
+        path={ROUTES.RESUME}
+      />
       <section className="page-hero">
         <div className="page-hero-ring" />
         <div className="wrap">

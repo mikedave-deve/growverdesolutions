@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { AdminSidebar } from "../components/admin/AdminSidebar.jsx";
 import { AdminTopbar } from "../components/admin/AdminTopbar.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -18,6 +19,9 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen flex bg-sand-50">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <AdminSidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} pendingCount={pendingCount} />
       <div className="flex-1 min-w-0 flex flex-col">
         <AdminTopbar user={user} onMenuClick={() => setMobileOpen(true)} />

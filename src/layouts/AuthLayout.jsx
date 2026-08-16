@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ROUTES } from "../constants/routes.js";
 import { Logo } from "../components/brand/Logo.jsx";
 import loginBg from "../assets/images/office/login.png";
@@ -7,6 +8,9 @@ import loginBg from "../assets/images/office/login.png";
 export function AuthLayout() {
   return (
     <div className="min-h-screen grid md:grid-cols-2 bg-sand-50">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="flex flex-col justify-between p-8 md:p-12">
         <Link to={ROUTES.HOME}><Logo /></Link>
         <div className="w-full max-w-sm mx-auto py-12">

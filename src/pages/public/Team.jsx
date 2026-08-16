@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Linkedin, Mail } from "lucide-react";
+import { SEO } from "../../components/seo/SEO.jsx";
 import { ROUTES } from "../../constants/routes.js";
 import { PhotoImage } from "../../components/public/PhotoImage.jsx";
 import { TEAM, LEADERSHIP } from "../../data/publicSiteData.js";
@@ -25,6 +26,11 @@ function TeamCard({ t }) {
 export function Team() {
   return (
     <div>
+      <SEO
+        title="Meet Our Team"
+        description="Meet the recruiters, researchers, and client partners behind Growverde Solutions — deep industry knowledge across healthcare, tech, finance, legal, marketing, and HR."
+        path={ROUTES.TEAM}
+      />
       <section className="page-hero">
         <div className="page-hero-ring" />
         <div className="wrap">

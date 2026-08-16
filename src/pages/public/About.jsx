@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Clock3, HeartHandshake, Sparkles, Users2 } from "lucide-react";
+import { SEO } from "../../components/seo/SEO.jsx";
 import { ROUTES } from "../../constants/routes.js";
 import { PhotoImage } from "../../components/public/PhotoImage.jsx";
 import { Counter } from "../../components/public/Counter.jsx";
@@ -23,6 +24,12 @@ const TIMELINE = [
 export function About() {
   return (
     <div>
+      <SEO
+        title="About Us"
+        description="Founded in 2014 in Austin, TX, Growverde Solutions has grown from a two-person healthcare desk into a staffing partner for 340+ client companies across six industries."
+        path={ROUTES.ABOUT}
+        image={headquartersPhoto}
+      />
       <section className="page-hero">
         <div className="page-hero-ring" />
         <div className="wrap">

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /portal
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /api
+
+Sitemap: https://growverdesolutions.com/sitemap.xml

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { X, CheckCircle2, ShieldCheck, ArrowUpRight, Layers, MousePointerClick, HeartHandshake, Clock3, Award } from "lucide-react";
+import { SEO } from "../../components/seo/SEO.jsx";
 import { ROUTES } from "../../constants/routes.js";
 import { PhotoImage } from "../../components/public/PhotoImage.jsx";
 import { Marquee, LogoChip, Pill } from "../../components/public/Marquee.jsx";
@@ -113,6 +114,12 @@ export function Home() {
 
   return (
     <div>
+      <SEO
+        title="Staffing & Recruitment Agency"
+        description="Growverde Solutions pairs ambitious professionals with organizations that need them — staffing and recruiting across healthcare, technology, finance, legal, marketing, and HR."
+        path={ROUTES.HOME}
+        image={heroPhoto}
+      />
       <section className="hero">
         <div className="wrap-wide hero-grid">
           <div>

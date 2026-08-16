@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Printer, ArrowLeft } from "lucide-react";
 import { Button, StatusPill } from "../../components/ui/Primitives.jsx";
 import { LoadingState, ErrorState } from "../../components/ui/States.jsx";
@@ -32,6 +33,9 @@ export function ShipmentInvoice() {
 
   return (
     <div className="min-h-screen bg-sand-100 py-10 px-4 print:bg-white print:p-0">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="max-w-3xl mx-auto flex items-center justify-between mb-4 print:hidden">
         <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-ink-700/60 hover:text-ink-900">
           <ArrowLeft size={14} /> Back

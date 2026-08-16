@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Sidebar } from "../components/layout/Sidebar.jsx";
 import { Topbar } from "../components/layout/Topbar.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -13,6 +14,9 @@ export function PortalLayout() {
 
   return (
     <NotificationsProvider>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="min-h-screen flex bg-sand-50">
         <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
         <div className="flex-1 min-w-0 flex flex-col">
