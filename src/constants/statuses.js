@@ -21,7 +21,12 @@ export const VERIFICATION_STATUS = {
   REJECTED: "Rejected",
 };
 
-export const SHIPMENT_STEPS = [
+// The default forward path — every shipment moves through these in
+// order. "On Hold" and "Returned" are exceptions layered on top (see
+// SHIPMENT_STEPS below): admin can set either one on a shipment that
+// needs it, and it's skipped entirely — never shown — on shipments
+// that don't.
+export const SHIPMENT_BASE_STEPS = [
   "Order Created",
   "Processing",
   "Packed",
@@ -29,9 +34,10 @@ export const SHIPMENT_STEPS = [
   "In Transit",
   "Out for Delivery",
   "Delivered",
-  "On Hold",
-  "Returned",
 ];
+
+// Full set of selectable statuses (used by the admin's status dropdown).
+export const SHIPMENT_STEPS = [...SHIPMENT_BASE_STEPS, "On Hold", "Returned"];
 
 export const TRANSPORT_MODES = ["Ground", "Air", "Sea", "Rail"];
 
