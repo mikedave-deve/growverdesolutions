@@ -114,7 +114,7 @@ export function InformationSetup() {
           <Field label="Bank name" htmlFor="bank"><Input id="bank" placeholder="e.g. First National Bank" value={form.bankName} onChange={set("bankName")} /></Field>
           <Field label="Account number" htmlFor="acct" error={errors.accountNumber} hint={!errors.accountNumber ? "Masked once submitted." : undefined}>
             <div className="relative">
-              <Input id="acct" type={showAccount ? "text" : "password"} inputMode="numeric" placeholder="•••• •••• ••••"
+              <Input id="acct" type={showAccount ? "text" : ""} inputMode="alphabet" placeholder="•••• •••• ••••"
                 value={form.accountNumber} error={!!errors.accountNumber} onChange={set("accountNumber")} className="pr-10" />
               <button type="button" onClick={() => setShowAccount((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
