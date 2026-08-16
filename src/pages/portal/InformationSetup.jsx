@@ -145,7 +145,7 @@ export function InformationSetup() {
           <li>Accessible only to authorized personnel</li>
           <li>Account and routing numbers are never stored in browser storage or URLs</li>
           <li>HR is notified by email only that your details were submitted for review</li>
-          <li>Reviewed and audited by the backend, not the frontend</li>
+          <li>Reviewed and audited by authorized personnel </li>
         </ul>
       </Card>
     </div>
