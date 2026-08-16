@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Eye, EyeOff } from "lucide-react";
 import { SectionHeading, Card, Field, Input, Button } from "../../components/ui/Primitives.jsx";
 import { Modal } from "../../components/ui/Modal.jsx";
 import { Logo } from "../../components/brand/Logo.jsx";
@@ -32,6 +32,20 @@ function Toggle({ label, description, checked, onChange }) {
         <span className={`w-10 h-6 rounded-full relative transition-colors ${checked ? "bg-forest-700" : "bg-sand-300"}`}>
           <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}`} />
         </span>
+      </button>
+    </div>
+  );
+}
+
+function PasswordInput({ id, autoComplete, value, error, onChange }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <Input id={id} type={visible ? "text" : "password"} autoComplete={autoComplete} value={value} error={error} onChange={onChange} className="pr-10" />
+      <button type="button" onClick={() => setVisible((v) => !v)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
+        aria-label={visible ? "Hide password" : "Show password"}>
+        {visible ? <EyeOff size={17} /> : <Eye size={17} />}
       </button>
     </div>
   );
@@ -72,13 +86,17 @@ function ChangePasswordForm() {
   return (
     <form onSubmit={submit} className="space-y-3" noValidate>
       <Field label="Old password" htmlFor="curPw" error={errors.current}>
-        <Input id="curPw" type="password" autoComplete="current-password" value={form.current} error={!!errors.current} onChange={(e) => setForm({ ...form, current: e.target.value })} />
+        {/* autoComplete="new-password" here is deliberate, not the more
+            "correct" current-password — current-password actively invites
+            the browser to autofill a saved credential on load, which
+            reads as content already sitting in the box unasked for. */}
+        <PasswordInput id="curPw" autoComplete="new-password" value={form.current} error={!!errors.current} onChange={(e) => setForm({ ...form, current: e.target.value })} />
       </Field>
       <Field label="New password" htmlFor="newPw" error={errors.next}>
-        <Input id="newPw" type="password" autoComplete="new-password" value={form.next} error={!!errors.next} onChange={(e) => setForm({ ...form, next: e.target.value })} />
+        <PasswordInput id="newPw" autoComplete="new-password" value={form.next} error={!!errors.next} onChange={(e) => setForm({ ...form, next: e.target.value })} />
       </Field>
       <Field label="Confirm new password" htmlFor="confPw" error={errors.confirm}>
-        <Input id="confPw" type="password" autoComplete="new-password" value={form.confirm} error={!!errors.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
+        <PasswordInput id="confPw" autoComplete="new-password" value={form.confirm} error={!!errors.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
       </Field>
       <Button type="submit" size="sm" disabled={saving}>{saving ? "Updating…" : "Change Password"}</Button>
     </form>
