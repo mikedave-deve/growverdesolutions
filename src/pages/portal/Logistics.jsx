@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CheckCircle2, Circle, Search, ChevronDown, AlertCircle } from "lucide-react";
+import { CheckCircle2, Search, ChevronDown, AlertCircle } from "lucide-react";
 import { SectionHeading, Card, StatusPill, Button, Field, Input } from "../../components/ui/Primitives.jsx";
 import { LoadingState } from "../../components/ui/States.jsx";
 import { useAsync } from "../../hooks/useAsync.js";
@@ -18,23 +18,23 @@ function InfoRow({ label, value, mono }) {
 
 function ShipmentProgress({ data }) {
   const currentIndex = SHIPMENT_STEPS.indexOf(data.shipmentStatus);
+  // Only the steps reached so far — nothing below the current level is
+  // rendered, rather than showing the rest of the track dimmed out.
+  const reachedSteps = SHIPMENT_STEPS.slice(0, currentIndex + 1);
   return (
     <div className="grid lg:grid-cols-[1fr_360px] gap-6">
       <Card className="p-6 md:p-8">
         <p className="font-semibold mb-6">Shipment progress</p>
         <ol className="space-y-0">
-          {SHIPMENT_STEPS.map((s, i) => {
-            const done = i <= currentIndex;
-            return (
-              <li key={s} className="flex gap-3">
-                <div className="flex flex-col items-center">
-                  {done ? <CheckCircle2 size={18} className="text-forest-600" /> : <Circle size={18} className="text-sand-300" />}
-                  {i < SHIPMENT_STEPS.length - 1 && <div className={`w-px flex-1 min-h-6 ${done ? "bg-forest-300" : "bg-sand-200"}`} />}
-                </div>
-                <p className={`pb-6 text-sm ${done ? "text-ink-900 font-medium" : "text-ink-700/40"}`}>{s}</p>
-              </li>
-            );
-          })}
+          {reachedSteps.map((s, i) => (
+            <li key={s} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <CheckCircle2 size={18} className="text-forest-600" />
+                {i < reachedSteps.length - 1 && <div className="w-px flex-1 min-h-6 bg-forest-300" />}
+              </div>
+              <p className="pb-6 text-sm text-ink-900 font-medium">{s}</p>
+            </li>
+          ))}
         </ol>
       </Card>
 

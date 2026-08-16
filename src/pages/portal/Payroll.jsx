@@ -14,9 +14,9 @@ import { ROUTES } from "../../constants/routes.js";
 
 function StatCard({ label, value, sub }) {
   return (
-    <Card className="p-5">
+    <Card className="p-5 min-w-0">
       <p className="text-xs text-ink-700/50 mb-1.5">{label}</p>
-      {value && <p className="font-display font-bold text-2xl">{value}</p>}
+      {value && <p className="font-display font-bold text-2xl truncate">{value}</p>}
       {sub && <div className={value ? "mt-1.5" : ""}>{sub}</div>}
     </Card>
   );
@@ -170,7 +170,7 @@ export function Payroll() {
 
       <AsyncBoundary {...current} loadingRows={4}>
         {current.data && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
             <StatCard label="Balance" value={formatCurrency(current.data.balance)} />
             <StatCard label="Next Pay Date" value={formatDate(current.data.nextPayDate)} />
             <StatCard label="Gross Pay" value={formatCurrency(current.data.grossPay)} />

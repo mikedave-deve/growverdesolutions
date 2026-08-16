@@ -26,7 +26,7 @@ const shipmentSchema = new Schema(
     paymentStatus: { type: String, enum: ["Paid", "Unpaid", "Pending"], default: "Paid" },
     shipmentStatus: {
       type: String,
-      enum: ["Order Created", "Processing", "Packed", "Shipped", "In Transit", "Out for Delivery", "Delivered"],
+      enum: ["Order Created", "Processing", "Packed", "Shipped", "In Transit", "Out for Delivery", "Delivered", "On Hold", "Returned"],
       default: "Order Created",
     },
   },

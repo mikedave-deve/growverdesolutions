@@ -35,7 +35,7 @@ const STATUS_TONE = {
   Active: "success", Completed: "success", Approved: "success", Available: "success", Paid: "success", Resolved: "success", Delivered: "success",
   "In Progress": "info", "Under Review": "info", "In Transit": "info", "Out for Delivery": "info", Processing: "info", Open: "info", Scheduled: "info",
   New: "neutral", "Not Started": "neutral", "Order Created": "neutral", Packed: "neutral", Shipped: "neutral",
-  Overdue: "error", Rejected: "error", Failed: "error", "Not Found": "error", Terminated: "error", Unpaid: "error",
+  Overdue: "error", Rejected: "error", Failed: "error", "Not Found": "error", Terminated: "error", Unpaid: "error", Returned: "error",
   "Requires Action": "warning", "Pending Signature": "warning", Incomplete: "warning", Submitted: "info", "Pending Confirmation": "warning", "On Leave": "warning", Suspended: "warning", "On Hold": "warning", Pending: "warning",
 };
 

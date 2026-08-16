@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const TRANSPORT_MODES = ["Ground", "Air", "Sea", "Rail"];
 const PAYMENT_STATUSES = ["Paid", "Unpaid", "Pending"];
-const SHIPMENT_STATUSES = ["Order Created", "Processing", "Packed", "Shipped", "In Transit", "Out for Delivery", "Delivered"];
+const SHIPMENT_STATUSES = ["Order Created", "Processing", "Packed", "Shipped", "In Transit", "Out for Delivery", "Delivered", "On Hold", "Returned"];
 
 function photoDataUri(file) {
   return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;

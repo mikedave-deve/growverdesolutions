@@ -29,6 +29,8 @@ export const SHIPMENT_STEPS = [
   "In Transit",
   "Out for Delivery",
   "Delivered",
+  "On Hold",
+  "Returned",
 ];
 
 export const TRANSPORT_MODES = ["Ground", "Air", "Sea", "Rail"];
