@@ -114,7 +114,7 @@ export function InformationSetup() {
           <Field label="Bank name" htmlFor="bank"><Input id="bank" placeholder="e.g. First National Bank" value={form.bankName} onChange={set("bankName")} /></Field>
           <Field label="Account number" htmlFor="acct" error={errors.accountNumber} hint={!errors.accountNumber ? "Masked once submitted." : undefined}>
             <div className="relative">
-              <Input id="acct" type={showAccount ? "text" : ""} inputMode="alphabet" placeholder="•••• •••• ••••"
+              <Input id="acct" type={showAccount ? "text" : "password"} inputMode="numeric" autoComplete="new-password" placeholder="•••• •••• ••••"
                 value={form.accountNumber} error={!!errors.accountNumber} onChange={set("accountNumber")} className="pr-10" />
               <button type="button" onClick={() => setShowAccount((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
@@ -125,7 +125,7 @@ export function InformationSetup() {
           </Field>
           <Field label="Routing number" htmlFor="routing" error={errors.routingNumber} hint={!errors.routingNumber ? "9-digit bank routing number." : undefined}>
             <div className="relative">
-              <Input id="routing" type={showRouting ? "text" : "password"} inputMode="numeric" placeholder="•••••••••"
+              <Input id="routing" type={showRouting ? "text" : "password"} inputMode="numeric" autoComplete="new-password" placeholder="•••••••••"
                 value={form.routingNumber} error={!!errors.routingNumber} onChange={set("routingNumber")} className="pr-10" />
               <button type="button" onClick={() => setShowRouting((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-700/40 hover:text-ink-800"
