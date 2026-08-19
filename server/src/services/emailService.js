@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import tls from "node:tls";
+import dns from "node:dns";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,10 +33,16 @@ function loadExtraTrustedRoots() {
 // runnable and demonstrable without needing real email infrastructure
 // set up first — swap in real SMTP env vars whenever they're ready
 // and nothing else changes.
-function buildTransport() {
+function buildTransport(host) {
   if (env.smtp.host && env.smtp.user && env.smtp.pass) {
     return nodemailer.createTransport({
-      host: env.smtp.host,
+      host: host || env.smtp.host,
+      // Required whenever `host` above is a literal IP rather than the
+      // real hostname (see resolveSmtpHost) — without it, TLS SNI and
+      // certificate hostname verification would target the IP itself,
+      // which Gmail's certificate doesn't cover, and the handshake
+      // would fail.
+      servername: env.smtp.host,
       port: env.smtp.port,
       secure: env.smtp.port === 465,
       auth: { user: env.smtp.user, pass: env.smtp.pass },
@@ -59,7 +66,27 @@ function buildTransport() {
   return nodemailer.createTransport({ jsonTransport: true });
 }
 
-const transporter = buildTransport();
+// Nodemailer resolves both A (IPv4) and AAAA (IPv6) records for the
+// SMTP host and picks one at random per connection attempt. On Render
+// (and similar containers that report an IPv6 interface without real
+// IPv6 egress), that random pick regularly lands on an unreachable
+// IPv6 address — "connect ENETUNREACH ... - Local (:::0)" — which is
+// what was silently failing "submitted" notifications in production,
+// while local sending (no IPv6 candidate offered at all there) always
+// worked. Resolving A records ourselves and pinning the connection to
+// one of those sidesteps the random IPv4/IPv6 pick entirely, while
+// still picking a fresh address each attempt so rotating Gmail IPs
+// stay handled. Falls back to the plain hostname if DNS resolution
+// itself fails, so a resolver hiccup doesn't hard-fail the send.
+async function resolveSmtpHost() {
+  if (!env.smtp.host) return undefined;
+  try {
+    const addresses = await dns.promises.resolve4(env.smtp.host);
+    return addresses[Math.floor(Math.random() * addresses.length)];
+  } catch {
+    return undefined;
+  }
+}
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -70,7 +97,7 @@ export async function sendEmail({ to, subject, text, html, attachments }) {
 
   let info;
   try {
-    info = await transporter.sendMail(message);
+    info = await buildTransport(await resolveSmtpHost()).sendMail(message);
   } catch (err) {
     // One quick retry: a connect-level failure to smtp.gmail.com is
     // almost always one specific rotating IP being briefly
@@ -78,7 +105,7 @@ export async function sendEmail({ to, subject, text, html, attachments }) {
     // attempt typically resolves a different IP and just works.
     console.warn(`[email] first attempt to ${to} failed (${err.message}) — retrying once…`);
     await delay(500);
-    info = await transporter.sendMail(message);
+    info = await buildTransport(await resolveSmtpHost()).sendMail(message);
   }
 
   if (info.message) {
