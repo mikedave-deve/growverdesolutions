@@ -19,21 +19,23 @@ Server runs on `http://localhost:4000` by default. The frontend's
 `VITE_API_BASE_URL` should point at `http://localhost:4000/api`
 (see `../.env.example` in the frontend project).
 
-Email is optional to configure: if `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS`
-are left blank, approval emails are logged to the server console
-instead of sent — the whole flow still works end-to-end for testing.
+Email is sent through Hostinger's HTTP Mail API
+(`api.mail.hostinger.com`), not raw SMTP — Render (and some other
+hosts) block outbound SMTP ports at the network level regardless of
+which mail provider you point at, which silently failed every
+submission email in production. The Mail API goes over plain HTTPS,
+which isn't blocked.
 
-If real SMTP sends fail with `self-signed certificate in certificate
-chain`, some antivirus software (Avast/Kaspersky/ESET "mail shield"
-features are common culprits) is transparently intercepting the SMTP
-connection and re-signing it with its own local root certificate.
-Two ways to fix it:
-- Drop that antivirus's local root certificate (`.pem`) into
-  `server/certs/` — `emailService.js` automatically trusts anything
-  there in addition to Node's normal trust store, without disabling
-  certificate verification.
-- Or turn off SSL/TLS scanning for mail traffic in the antivirus
-  settings.
+Email is optional to configure: if `HOSTINGER_API_TOKEN` is left
+blank, emails are logged to the server console instead of sent — the
+whole flow still works end-to-end for testing.
+
+To send real email:
+1. In the Hostinger Panel, open the mailbox's email provisioning tab
+   and create an API token — copy it into `HOSTINGER_API_TOKEN`.
+2. Set `HOSTINGER_MAILBOX_ADDRESS` to the mailbox to send from (must
+   be a mailbox that token has access to). Falls back to `SMTP_USER`
+   if unset, for compatibility with an older local setup.
 
 ## Creating the first admin account
 

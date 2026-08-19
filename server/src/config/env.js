@@ -18,18 +18,18 @@ export const env = {
   jwtExpiresInDaysRemember: Number(process.env.JWT_EXPIRES_IN_DAYS_REMEMBER || 30),
   frontendOrigin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
   frontendLoginUrl: process.env.FRONTEND_LOGIN_URL || "http://localhost:5173/login",
-  smtp: {
-    host: process.env.SMTP_HOST || "",
-    port: Number(process.env.SMTP_PORT || 587),
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
+  // Email is sent through Hostinger's HTTP Mail API (api.mail.hostinger.com)
+  // rather than raw SMTP — Render blocks outbound SMTP ports (25/465/587)
+  // at the network level, which silently failed every submission email in
+  // production regardless of which SMTP provider was configured. The Mail
+  // API goes over plain HTTPS, which isn't blocked. See server/README.md.
+  hostinger: {
+    apiToken: process.env.HOSTINGER_API_TOKEN || "",
+    // The Hostinger mailbox to send from — falls back to SMTP_USER so an
+    // existing local setup keeps working without adding a new var.
+    mailboxAddress: process.env.HOSTINGER_MAILBOX_ADDRESS || process.env.SMTP_USER || "",
+    displayName: process.env.EMAIL_DISPLAY_NAME || "Growverde Solutions",
   },
-  // Falls back to the authenticated SMTP account itself (never an
-  // unrelated domain) — a From address that doesn't match the sending
-  // account's own domain/aliases has no SPF/DKIM to back it and gets
-  // spam-filtered or dropped by recipients even though SMTP accepts it.
-  emailFrom: process.env.EMAIL_FROM ||
-    (process.env.SMTP_USER ? `Growverde Solutions <${process.env.SMTP_USER}>` : "Growverde Solutions <no-reply@growverdesolutions.com>"),
   // Where internal submissions (Information Setup, etc.) get emailed —
   // defaults to the SMTP account itself since that's already the
   // company inbox in every environment this has been configured for.
