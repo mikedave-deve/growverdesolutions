@@ -131,7 +131,7 @@ export function Verification() {
                 <Field
                   label="SSN"
                   htmlFor="ssn"
-                  hint="Fictional/test value only — never enter a real SSN in this demo."
+                  hint=""
                 >
                   <div className="relative">
                     <Lock
