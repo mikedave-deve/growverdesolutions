@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, Pencil, FileText, ClipboardList, Wallet, Truck, KeyRound, Copy, Check } from "lucide-react";
+import { Users, Pencil, FileText, ClipboardList, Wallet, Truck, KeyRound, Copy, Check, Trash2 } from "lucide-react";
 import { SectionHeading, Card, Button, Field, Input, StatusPill } from "../../components/ui/Primitives.jsx";
 import { AsyncBoundary, EmptyState } from "../../components/ui/States.jsx";
 import { DataTable } from "../../components/ui/DataTable.jsx";
@@ -29,6 +29,8 @@ export function Employees() {
   const [resetting, setResetting] = useState(null); // employee row a reset is in flight/result for
   const [resetResult, setResetResult] = useState(null); // { employee, tempPassword }
   const [copied, setCopied] = useState(false);
+  const [deleting, setDeleting] = useState(null); // the employee row pending delete confirmation
+  const [removing, setRemoving] = useState(false);
 
   const users = employees.data?.users || [];
 
@@ -65,6 +67,20 @@ export function Employees() {
   const copyTempPassword = async () => {
     await navigator.clipboard.writeText(resetResult.tempPassword);
     setCopied(true);
+  };
+
+  const confirmDelete = async () => {
+    setRemoving(true);
+    try {
+      await adminService.deleteUser(deleting.id);
+      push(`${deleting.firstName} ${deleting.lastName}'s account was deleted.`, "success", "Employee deleted");
+      setDeleting(null);
+      employees.retry();
+    } catch (err) {
+      push(err.message || "Something went wrong. Please try again.", "error");
+    } finally {
+      setRemoving(false);
+    }
   };
 
   const save = async (e) => {
@@ -114,6 +130,9 @@ export function Employees() {
         </Button>
         <Button variant="secondary" size="sm" onClick={() => resetPassword(r)} disabled={resetting === r.id}>
           <KeyRound size={14} /> {resetting === r.id ? "Resetting…" : "Reset password"}
+        </Button>
+        <Button variant="danger" size="sm" onClick={() => setDeleting(r)}>
+          <Trash2 size={14} /> Delete
         </Button>
       </div>
     ) },
@@ -201,6 +220,27 @@ export function Employees() {
               {resetResult.employee.firstName}'s previous password no longer works.
             </p>
           </div>
+        )}
+      </Modal>
+
+      <Modal
+        open={!!deleting}
+        onClose={() => setDeleting(null)}
+        title="Delete this employee?"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setDeleting(null)}>Cancel</Button>
+            <Button variant="danger" size="sm" disabled={removing} onClick={confirmDelete}>
+              {removing ? "Deleting…" : "Delete Employee"}
+            </Button>
+          </>
+        }
+      >
+        {deleting && (
+          <p className="text-sm text-ink-700/70">
+            <strong>{deleting.firstName} {deleting.lastName}</strong>'s account will be permanently deleted,
+            along with their documents, missions, attendance, payroll, and activity history. This can't be undone.
+          </p>
         )}
       </Modal>
     </div>

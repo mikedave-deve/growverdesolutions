@@ -2,6 +2,16 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
 import { ActivityLog } from "../models/ActivityLog.js";
+import { Document } from "../models/Document.js";
+import { Mission } from "../models/Mission.js";
+import { AttendanceEntry } from "../models/AttendanceEntry.js";
+import { PayrollCurrent } from "../models/PayrollCurrent.js";
+import { PayHistoryEntry } from "../models/PayHistoryEntry.js";
+import { Transfer } from "../models/Transfer.js";
+import { Notification } from "../models/Notification.js";
+import { SupportTicket } from "../models/SupportTicket.js";
+import { DepositAccount } from "../models/DepositAccount.js";
+import { Shipment } from "../models/Shipment.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendEmail } from "../services/emailService.js";
@@ -114,4 +124,40 @@ export const resetEmployeePassword = asyncHandler(async (req, res) => {
   await ActivityLog.record(user._id, "Password reset by admin");
 
   res.status(200).json({ tempPassword });
+});
+
+// DELETE /api/admin/users/:id
+// Permanently removes the account and everything scoped to it
+// (documents, missions, attendance, payroll, transfers, notifications,
+// support tickets, deposit accounts, shipments, activity log) — same
+// records the employee's own portal reads. Left alone: audit-trail
+// pointers on *other* people's records (a document's uploadedBy, a
+// mission's sentBy, another user's approvedBy) — those describe an
+// action this user took, not data belonging to them, and dropping them
+// would corrupt someone else's history.
+export const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (id === String(req.user._id)) {
+    throw new AppError("You can't delete your own account.", 400);
+  }
+
+  const user = await User.findById(id);
+  if (!user) throw new AppError("User not found.", 404);
+
+  await Promise.all([
+    Document.deleteMany({ employee: id }),
+    Mission.deleteMany({ employee: id }),
+    AttendanceEntry.deleteMany({ employee: id }),
+    PayrollCurrent.deleteMany({ employee: id }),
+    PayHistoryEntry.deleteMany({ employee: id }),
+    Transfer.deleteMany({ employee: id }),
+    Notification.deleteMany({ employee: id }),
+    SupportTicket.deleteMany({ employee: id }),
+    DepositAccount.deleteMany({ employee: id }),
+    Shipment.deleteMany({ employee: id }),
+    ActivityLog.deleteMany({ employee: id }),
+  ]);
+  await user.deleteOne();
+
+  res.status(200).json({ ok: true });
 });

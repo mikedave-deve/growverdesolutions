@@ -11,6 +11,7 @@ export const adminService = {
   getEmployees: () => apiClient.get("/admin/users/employees"),
   updateEmployeeProfile: (id, updates) => apiClient.patch(`/admin/users/${id}/employment`, updates),
   resetEmployeePassword: (id) => apiClient.post(`/admin/users/${id}/reset-password`),
+  deleteUser: (id) => apiClient.delete(`/admin/users/${id}`),
 
   getEmployeeDocuments: (employeeId) =>
     apiClient.get(`/admin/users/${employeeId}/documents`).then((r) => r.documents),
