@@ -1,9 +1,14 @@
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
+import { ActivityLog } from "../models/ActivityLog.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendEmail } from "../services/emailService.js";
 import { approvalEmail } from "../templates/approvalEmail.js";
 import { env } from "../config/env.js";
+
+const SALT_ROUNDS = 12;
 
 // GET /api/admin/users/pending
 export const listPendingUsers = asyncHandler(async (req, res) => {
@@ -90,4 +95,23 @@ export const updateEmployeeProfile = asyncHandler(async (req, res) => {
 
   await user.save();
   res.status(200).json({ user: user.toSafeJSON() });
+});
+
+// POST /api/admin/users/:id/reset-password
+// There's no way to recover a user's existing password — it's hashed,
+// not encrypted, so it's not stored anywhere in a reversible form. When
+// an employee needs a password (forgot it, locked out, etc.), an admin
+// issues a brand-new temporary one instead. It's returned in this
+// response exactly once, for the admin to hand to the employee
+// directly — it is never stored or logged in plaintext, only its hash.
+export const resetEmployeePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new AppError("User not found.", 404);
+
+  const tempPassword = crypto.randomBytes(9).toString("base64url"); // 12 chars
+  user.passwordHash = await bcrypt.hash(tempPassword, SALT_ROUNDS);
+  await user.save();
+  await ActivityLog.record(user._id, "Password reset by admin");
+
+  res.status(200).json({ tempPassword });
 });

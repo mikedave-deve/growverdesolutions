@@ -10,6 +10,7 @@ export const adminService = {
   rejectUser: (id) => apiClient.post(`/admin/users/${id}/reject`),
   getEmployees: () => apiClient.get("/admin/users/employees"),
   updateEmployeeProfile: (id, updates) => apiClient.patch(`/admin/users/${id}/employment`, updates),
+  resetEmployeePassword: (id) => apiClient.post(`/admin/users/${id}/reset-password`),
 
   getEmployeeDocuments: (employeeId) =>
     apiClient.get(`/admin/users/${employeeId}/documents`).then((r) => r.documents),

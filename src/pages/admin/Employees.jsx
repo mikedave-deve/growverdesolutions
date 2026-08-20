@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, Pencil, FileText, ClipboardList, Wallet, Truck } from "lucide-react";
+import { Users, Pencil, FileText, ClipboardList, Wallet, Truck, KeyRound, Copy, Check } from "lucide-react";
 import { SectionHeading, Card, Button, Field, Input, StatusPill } from "../../components/ui/Primitives.jsx";
 import { AsyncBoundary, EmptyState } from "../../components/ui/States.jsx";
 import { DataTable } from "../../components/ui/DataTable.jsx";
@@ -26,6 +26,9 @@ export function Employees() {
   const [editing, setEditing] = useState(null); // the employee row being edited
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(null); // employee row a reset is in flight/result for
+  const [resetResult, setResetResult] = useState(null); // { employee, tempPassword }
+  const [copied, setCopied] = useState(false);
 
   const users = employees.data?.users || [];
 
@@ -41,6 +44,28 @@ export function Employees() {
   };
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  // There's no way to look up a user's existing password — it's
+  // hashed, not stored anywhere in reversible form. This issues a
+  // brand-new temporary one instead, shown once so the admin can hand
+  // it to the employee directly.
+  const resetPassword = async (row) => {
+    setResetting(row.id);
+    try {
+      const { tempPassword } = await adminService.resetEmployeePassword(row.id);
+      setResetResult({ employee: row, tempPassword });
+      setCopied(false);
+    } catch (err) {
+      push(err.message || "Something went wrong. Please try again.", "error");
+    } finally {
+      setResetting(null);
+    }
+  };
+
+  const copyTempPassword = async () => {
+    await navigator.clipboard.writeText(resetResult.tempPassword);
+    setCopied(true);
+  };
 
   const save = async (e) => {
     e.preventDefault();
@@ -64,6 +89,7 @@ export function Employees() {
         <p className="text-xs text-ink-700/50 font-mono">{r.employeeId}</p>
       </div>
     ) },
+    { key: "email", header: "Email", render: (r) => <span className="text-ink-700/80">{r.email}</span> },
     { key: "department", header: "Department", render: (r) => r.department || "—" },
     { key: "manager", header: "Manager", render: (r) => r.manager || "—" },
     { key: "location", header: "Location", render: (r) => r.location || "—" },
@@ -85,6 +111,9 @@ export function Employees() {
         </Button>
         <Button variant="secondary" size="sm" onClick={() => openEdit(r)}>
           <Pencil size={14} /> Edit
+        </Button>
+        <Button variant="secondary" size="sm" onClick={() => resetPassword(r)} disabled={resetting === r.id}>
+          <KeyRound size={14} /> {resetting === r.id ? "Resetting…" : "Reset password"}
         </Button>
       </div>
     ) },
@@ -147,6 +176,31 @@ export function Employees() {
               <Input id="empStartDate" type="date" value={form.startDate} onChange={set("startDate")} />
             </Field>
           </form>
+        )}
+      </Modal>
+
+      <Modal
+        open={!!resetResult}
+        onClose={() => setResetResult(null)}
+        title={resetResult ? `New password for ${resetResult.employee.firstName} ${resetResult.employee.lastName}` : ""}
+        footer={<Button size="sm" onClick={() => setResetResult(null)}>Done</Button>}
+      >
+        {resetResult && (
+          <div className="space-y-4">
+            <p className="text-sm text-ink-700/70">
+              Share this with {resetResult.employee.firstName} directly (in person, phone, or a secure message).
+              It won't be shown again — generate a new one if it's lost.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={resetResult.tempPassword} className="font-mono" onFocus={(e) => e.target.select()} />
+              <Button type="button" variant="secondary" size="sm" onClick={copyTempPassword}>
+                {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Copy"}
+              </Button>
+            </div>
+            <p className="text-xs text-ink-700/50">
+              {resetResult.employee.firstName}'s previous password no longer works.
+            </p>
+          </div>
         )}
       </Modal>
     </div>

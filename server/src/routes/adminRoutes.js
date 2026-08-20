@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  listPendingUsers, approveUser, rejectUser, listEmployees, updateEmployeeProfile,
+  listPendingUsers, approveUser, rejectUser, listEmployees, updateEmployeeProfile, resetEmployeePassword,
 } from "../controllers/adminController.js";
 import {
   listEmployeeDocuments, uploadEmployeeDocument, updateEmployeeDocument,
@@ -26,6 +26,7 @@ router.post("/users/:id/approve", approveUser);
 router.post("/users/:id/reject", rejectUser);
 router.get("/users/employees", listEmployees);
 router.patch("/users/:id/employment", updateEmployeeProfile);
+router.post("/users/:id/reset-password", resetEmployeePassword);
 
 router.get("/users/:id/documents", listEmployeeDocuments);
 router.post("/users/:id/documents", documentUpload, uploadEmployeeDocument);
