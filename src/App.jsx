@@ -17,6 +17,8 @@ import { Resume } from "./pages/public/Resume.jsx";
 
 import { Login } from "./pages/auth/Login.jsx";
 import { Register } from "./pages/auth/Register.jsx";
+import { ForgotPassword } from "./pages/auth/ForgotPassword.jsx";
+import { ResetPassword } from "./pages/auth/ResetPassword.jsx";
 
 import { Dashboard } from "./pages/portal/Dashboard.jsx";
 import { Profile } from "./pages/portal/Profile.jsx";
@@ -57,6 +59,8 @@ export default function App() {
       <Route element={<AuthLayout />}>
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
+        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
       </Route>
 
       {/* Any signed-in account (any role) can use the employee portal. */}

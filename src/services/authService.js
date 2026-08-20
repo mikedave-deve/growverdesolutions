@@ -1,4 +1,4 @@
-import { apiClient, mockRequest } from "./api/client.js";
+import { apiClient } from "./api/client.js";
 
 // Registration, login, logout, and session now call the real Express
 // API (see /server). The API sets an httpOnly session cookie —
@@ -10,8 +10,8 @@ export const authService = {
   logout: () => apiClient.post("/auth/logout"),
   getSession: () => apiClient.get("/auth/session"),
 
-  // Not part of this pass — password reset still has no backend yet.
-  requestPasswordReset: (email) => mockRequest({ ok: true }, { delay: 600 }),
+  requestPasswordReset: (email) => apiClient.post("/auth/forgot-password", { email }),
+  resetPassword: (token, newPassword) => apiClient.post("/auth/reset-password", { token, newPassword }),
 
   changePassword: (currentPassword, newPassword) =>
     apiClient.post("/auth/change-password", { currentPassword, newPassword }),

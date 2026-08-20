@@ -1,11 +1,16 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
 import { ActivityLog } from "../models/ActivityLog.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { signToken, setSessionCookie, clearSessionCookie, readSessionCookie, verifyToken } from "../utils/token.js";
+import { sendEmail } from "../services/emailService.js";
+import { resetPasswordEmail } from "../templates/resetPasswordEmail.js";
+import { env } from "../config/env.js";
 
 const SALT_ROUNDS = 12;
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 function isValidEmail(value = "") {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -107,6 +112,57 @@ export const logout = asyncHandler(async (req, res) => {
 // used to restore a session on page reload.
 export const getSession = asyncHandler(async (req, res) => {
   res.status(200).json({ user: req.user.toSafeJSON() });
+});
+
+// POST /api/auth/forgot-password
+// Always responds with the same generic message whether or not the
+// email matches an account — that's what stops this endpoint from
+// being usable to find out which emails are registered.
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!isValidEmail(email)) throw new AppError("Enter a valid email address.", 400);
+
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
+  if (user) {
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    user.passwordResetTokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+    await user.save();
+
+    const resetUrl = `${env.frontendOrigin}/reset-password?token=${rawToken}`;
+    const { subject, text, html } = resetPasswordEmail({ firstName: user.firstName, resetUrl });
+    try {
+      await sendEmail({ to: user.email, subject, text, html });
+    } catch (err) {
+      console.error(`[auth] password reset email to ${user.email} failed to send:`, err.message);
+    }
+  }
+
+  res.status(200).json({
+    message: "If an account exists for that email, we've sent a link to reset your password.",
+  });
+});
+
+// POST /api/auth/reset-password
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token) throw new AppError("This reset link is invalid or has expired.", 400);
+  if (!newPassword || newPassword.length < 8) throw new AppError("New password must be at least 8 characters.", 400);
+
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    passwordResetTokenHash: tokenHash,
+    passwordResetExpires: { $gt: new Date() },
+  });
+  if (!user) throw new AppError("This reset link is invalid or has expired. Request a new one.", 400);
+
+  user.passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+  user.passwordResetTokenHash = null;
+  user.passwordResetExpires = null;
+  await user.save();
+  await ActivityLog.record(user._id, "Reset password");
+
+  res.status(200).json({ ok: true });
 });
 
 // POST /api/auth/change-password

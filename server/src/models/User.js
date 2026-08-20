@@ -15,6 +15,13 @@ const userSchema = new Schema(
     // Never returned to the client — see toSafeJSON() below.
     passwordHash: { type: String, required: true, select: false },
 
+    // Set when a "forgot password" email is requested; cleared once
+    // used (or once a new one is issued). Stores a hash of the token,
+    // never the raw value that's emailed to the user — same reasoning
+    // as passwordHash.
+    passwordResetTokenHash: { type: String, select: false, default: null },
+    passwordResetExpires: { type: Date, select: false, default: null },
+
     role: {
       type: String,
       enum: ["employee", "hr_manager", "administrator", "super_admin"],

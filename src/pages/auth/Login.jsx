@@ -91,7 +91,7 @@ export function Login() {
               className="rounded border-sand-300 text-forest-700 focus:ring-forest-500" />
             Remember me
           </label>
-          <Link to="#" className="text-forest-700 font-medium hover:underline">Forgot password?</Link>
+          <Link to={ROUTES.FORGOT_PASSWORD} className="text-forest-700 font-medium hover:underline">Forgot password?</Link>
         </div>
 
         <Button type="submit" className="w-full" disabled={status === "loading"}>
